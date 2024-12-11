@@ -1,30 +1,44 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const { OAuth2Client } = require('google-auth-library');
 const cors = require('cors');
-
 const app = express();
-app.use(bodyParser.json());
-app.use(cors()); // Allow requests from the frontend
 
-// Dummy user data
-const users = [
-  { username: 'admin', password: '1234' },
-  { username: 'user1', password: 'password1' }
-];
+// Replace with your actual Google Client ID
+const CLIENT_ID = '330728490953-vpkh8np87ca1trr2np53kc7cs79sub8c.apps.googleusercontent.com';
+const client = new OAuth2Client(CLIENT_ID);
 
-// Login endpoint
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
+// Middleware
+app.use(cors({ origin: 'http://localhost:3001', credentials: true }));
+app.use(express.json()); // To parse JSON request bodies
 
-  // Find user
-  const user = users.find(u => u.username === username && u.password === password);
+// Route to verify the Google token
+app.post('/auth/google/verify', async (req, res) => {
+  const { token } = req.body;
 
-  if (user) {
-    res.status(200).json({ message: 'Login successful', username });
-  } else {
-    res.status(401).json({ message: 'Invalid username or password' });
+  if (!token) {
+    return res.status(400).json({ error: 'Token is missing' });
+  }
+
+  try {
+    // Verify the token with Google's OAuth2 client
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: CLIENT_ID,  // Ensure the audience matches the Client ID
+    });
+
+    const payload = ticket.getPayload(); // Get user data from token payload
+    res.json({
+      name: payload.name,
+      email: payload.email,
+    });
+  } catch (error) {
+    console.error('Error verifying Google token:', error);
+    res.status(401).json({ error: 'Invalid Google token' });
   }
 });
 
+// Start the server
 const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Backend server running on http://localhost:${PORT}`);
+});

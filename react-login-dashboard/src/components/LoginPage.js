@@ -1,48 +1,43 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 
 const LoginPage = ({ setUser }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post('http://localhost:5000/login', { username, password });
-      setUser(response.data.username); // Set user on successful login
-      navigate('/dashboard'); // Redirect to the dashboard
-    } catch (err) {
-      setError('Invalid username or password');
+  const handleGoogleLogin = (credentialResponse) => {
+    console.log('Google credentialResponse:', credentialResponse);
+    if (!credentialResponse || !credentialResponse.credential) {
+      console.error('Google login failed: No credential received.');
+      setError('Google login failed');
+      return;
     }
+    // Send token to backend
+    axios
+      .post('http://localhost:5000/auth/google/verify', {
+        token: credentialResponse.credential,
+      })
+      .then((res) => {
+        setUser(res.data.name);
+        navigate('/dashboard');
+      })
+      .catch((err) => {
+        console.error('Error verifying Google token:', err.response?.data || err);
+        setError('Google login failed');
+      });
   };
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       <h2>Login Page</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Enter Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: '10px', fontSize: '16px', marginBottom: '10px' }}
+      <div style={{ marginTop: '20px' }}>
+        <GoogleLogin
+          onSuccess={handleGoogleLogin}
+          onError={() => setError('Google login failed')}
         />
-        <br />
-        <input
-          type="password"
-          placeholder="Enter Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: '10px', fontSize: '16px' }}
-        />
-        <br />
-        <button type="submit" style={{ padding: '10px 20px', marginTop: '10px' }}>
-          Login
-        </button>
-      </form>
+      </div>
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
