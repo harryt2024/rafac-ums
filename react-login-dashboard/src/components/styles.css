@@ -1,0 +1,44 @@
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5x; /* Increased padding for more room on the right */
+    color: white;
+    z-index: 1000; /* Ensures the header stays above other elements */
+    box-sizing: border-box; /* Ensures padding is included in width */
+}
+
+.header-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 200px; /* Ensures button width is dynamic */
+    max-width: 120px; /* Prevents button from being too wide */
+    text-align: center;
+    margin-left: auto; /* Pushes the button to the right */
+    margin-right: 10px; /* Adds space between the button and the right edge */
+}
+
+.header-button:hover {
+    background-color: #0056b3;
+}
+
+.content {
+    padding-top: 70px; /* Matches header height + margin */
+}
+
+/* Example content styling */
+.content p {
+    padding: 20px;
+    line-height: 1.6;
+}

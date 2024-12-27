@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import './styles.css'
 
 const Dashboard = ({ user }) => {
   const navigate = useNavigate();
@@ -9,17 +10,13 @@ const Dashboard = ({ user }) => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ textAlign: 'right' }}>
+    <div>
+      <div>
         <span>Welcome, {user}!</span>
-        <button 
-          onClick={handleLogout} 
-          style={{ marginLeft: '20px', padding: '5px 10px' }}
-        >
-          Logout
-        </button>
       </div>
-      <h1 style={{ textAlign: 'center', marginTop: '50px' }}>Dashboard</h1>
+
+      <header><button onClick={handleLogout} class="header-button">Logout</button></header>
+      <h1>Dashboard</h1>
     </div>
   );
 };

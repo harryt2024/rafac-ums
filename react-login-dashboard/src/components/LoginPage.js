@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import '../App.css'
 
 const LoginPage = ({ setUser }) => {
   const [error, setError] = useState('');
